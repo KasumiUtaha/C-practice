@@ -7,10 +7,9 @@ int main(int argc, char **argv)
     if (false) // make false to run unit-tests
     {
         // debug section
-        Matrix matrix{{-1, 1.5, -1.75, -2}, {-2, 2.5, -2.75, -3}, {3, 3.5, -3.75, -4}, {4, 4.5, 4.75, -5}};
-        Matrix tmp;
-        tmp = algebra::inverse(matrix);
-        algebra::show(tmp);
+        Matrix matrix2{{0, 2, 3}, {4, 7, 5}, {6, 1, 3}};
+        algebra::upper_triangular(matrix2);
+        std::cout<<"Success!";
     }
     else
     {

@@ -213,12 +213,13 @@ Matrix algebra::inverse(const Matrix &matrix)
     Matrix ans = zeros(row, column);
     for (int i = 0; i < row; i++)
     {
-        double flag=1;
-        if(i&1) flag=-1;
+        double flag = 1;
+        if (i & 1)
+            flag = -1;
         for (int j = 0; j < column; j++)
         {
             ans[i][j] = determinant(minor(matrix, i, j)) / det * flag;
-            flag=-flag;
+            flag = -flag;
         }
     }
     return transpose(ans);
@@ -264,3 +265,88 @@ Matrix algebra::concatenate(const Matrix &matrix1, const Matrix &matrix2, int ax
         return ans;
     }
 }
+
+Matrix algebra::ero_swap(const Matrix &matrix, size_t r1, size_t r2)
+{
+    if (r1 >= matrix.size() || r2 >= matrix.size() || r1 < 0 || r2 < 0)
+    {
+        throw std::logic_error("wrong row number");
+    }
+    Matrix ans;
+    for (int i = 0; i < matrix.size(); i++)
+    {
+        if (i == r1)
+            ans.push_back(matrix[r2]);
+        else if (i == r2)
+            ans.push_back(matrix[r1]);
+        else
+            ans.push_back(matrix[i]);
+    }
+    return ans;
+}
+
+Matrix algebra::ero_multiply(const Matrix &matrix, size_t r, double c)
+{
+    if (r >= matrix.size() || r < 0)
+    {
+        throw std::logic_error("wrong row number!");
+    }
+    Matrix ans = matrix;
+    for (int i = 0; i < matrix[r].size(); i++)
+    {
+        ans[r][i] *= c;
+    }
+    return ans;
+}
+
+Matrix algebra::ero_sum(const Matrix &matrix, size_t r1, double c, size_t r2)
+{
+    if (r1 >= matrix.size() || r2 >= matrix.size() || r1 < 0 || r2 < 0)
+    {
+        throw std::logic_error("wrong row number");
+    }
+    Matrix ans = matrix;
+    for (int i = 0; i < ans[r1].size(); i++)
+    {
+        ans[r2][i] += ans[r1][i] * c;
+    }
+    return ans;
+}
+
+Matrix algebra::upper_triangular(const Matrix& matrix)
+{
+    if(matrix.empty()) return matrix;
+    if(matrix.size() != matrix[0].size()) 
+    {
+        throw std::logic_error("have no upper_triangle!");
+    }
+    int row=matrix.size();
+    int column=matrix[0].size();
+    Matrix ans=matrix;
+    for(int i=0;i<row;i++)
+    {
+        int nxtrow=i;
+        if(ans[i][i] == 0)
+        {
+            for(int j=i+1;j<row;j++)
+            {
+                if(ans[j][i] != 0)
+                {
+                    nxtrow=j;
+                    break;
+                }
+            }
+        }
+        ans=ero_swap(ans,i,nxtrow);
+        for(int j=i+1;j<row;j++)
+        {
+            if(ans[j][i] != 0)
+            {
+                ans=ero_sum(ans,i,-ans[j][i]/ans[i][i],j);
+
+            }
+        }
+    }
+    return ans;
+}
+
