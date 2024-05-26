@@ -42,7 +42,7 @@ Matrix algebra::random(size_t n, size_t m, double min, double max)
     }
     Matrix matrix = init(n, m, 0);
     std::default_random_engine e(time(0));
-    std::uniform_real_distribution u(min, max);
+    std::uniform_real_distribution<double> u(min, max);
 
     for (auto &x : matrix)
     {
@@ -164,20 +164,103 @@ Matrix algebra::transpose(const Matrix &matrix)
     return ans;
 }
 
-
-Matrix algebra::minor(const Matrix& matrix , size_t n ,size_t m)
+Matrix algebra::minor(const Matrix &matrix, size_t n, size_t m)
 {
-    if(matrix.empty() || matrix.size() < n || matrix[0].size() < m)
-    {  
+    if (matrix.empty() || matrix.size() < n || matrix[0].size() < m)
+    {
         throw std::logic_error("can't create!");
     }
     Matrix ans = matrix;
     ans.erase(ans.begin() + n);
-    for(auto& x : ans)
+    for (auto &x : ans)
     {
         x.erase(x.begin() + m);
     }
     return ans;
 }
 
+double algebra::determinant(const Matrix &matrix)
+{
+    if (matrix.empty())
+        return 1;
+    if (matrix.size() != matrix[0].size())
+    {
+        throw std::logic_error("don't have determinant!");
+    }
+    if (matrix.size() == 1)
+        return matrix[0][0];
+    double sum = 0;
+    int flag = 1;
+    for (auto i = 0; i < (int)matrix.size(); i++)
+    {
+        sum += determinant(minor(matrix, i, 0)) * flag * matrix[i][0];
+        flag = -flag;
+    }
+    return sum;
+}
 
+Matrix algebra::inverse(const Matrix &matrix)
+{
+    double det = determinant(matrix);
+    if (matrix.empty())
+        return matrix;
+    if (det == 0.0)
+    {
+        throw std::logic_error("No inverse!");
+    }
+    int row = matrix.size();
+    int column = matrix[0].size();
+    Matrix ans = zeros(row, column);
+    for (int i = 0; i < row; i++)
+    {
+        double flag=1;
+        if(i&1) flag=-1;
+        for (int j = 0; j < column; j++)
+        {
+            ans[i][j] = determinant(minor(matrix, i, j)) / det * flag;
+            flag=-flag;
+        }
+    }
+    return transpose(ans);
+}
+
+Matrix algebra::concatenate(const Matrix &matrix1, const Matrix &matrix2, int axis = 0)
+{
+    if (axis != 0 && axis != 1)
+    {
+        throw std::logic_error("wrong axis!");
+    }
+    if (matrix1.empty())
+        return matrix2;
+    if (matrix2.empty())
+        return matrix1;
+    if (!axis)
+    {
+        if (matrix1[0].size() != matrix2[0].size())
+        {
+            throw std::logic_error("can't concatenate");
+        }
+        Matrix ans = matrix1;
+        for (int i = 0; i < matrix2.size(); i++)
+        {
+            ans.push_back(matrix2[i]);
+        }
+        return ans;
+    }
+    else
+    {
+        if (matrix1.size() != matrix2.size())
+        {
+            throw std::logic_error("can't concatenate");
+        }
+        Matrix ans = matrix1;
+        for (int i = 0; i < matrix1.size(); i++)
+        {
+            for (int j = 0; j < matrix2[i].size(); j++)
+            {
+                ans[i].push_back(matrix2[i][j]);
+            }
+        }
+        return ans;
+    }
+}

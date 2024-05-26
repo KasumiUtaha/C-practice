@@ -193,7 +193,7 @@ TEST(HW1Test, MINOR2) {
     EXPECT_DOUBLE_EQ(minor[1][0], matrix[2][0]);
     EXPECT_DOUBLE_EQ(minor[1][1], matrix[2][2]);
 }
-/*
+
 TEST(HW1Test, DETERMINANT1) {
     // Caution: determinant of an empty matrix
     EXPECT_EQ(algebra::determinant(Matrix{}), 1);
@@ -283,7 +283,7 @@ TEST(HW1Test, CONCATENATE2) {
     EXPECT_DOUBLE_EQ(matrix[0][3], matrix2[0][0]);
     EXPECT_DOUBLE_EQ(matrix[1][3], matrix2[1][0]);
 }
-
+/*
 TEST(HW1Test, ERO_SWAP) {
     // Caution: r1 or r2 inputs are out of range
     EXPECT_THROW(algebra::ero_swap(Matrix{{1, 2}}, 0, 1), std::logic_error);
